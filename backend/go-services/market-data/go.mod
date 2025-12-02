@@ -1,6 +1,6 @@
 module github.com/alfamarket/backend/market-data
 
-go 1.25.4
+go 1.24.0
 
 require (
 	github.com/redis/go-redis/v9 v9.17.2
