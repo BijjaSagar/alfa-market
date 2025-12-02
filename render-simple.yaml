@@ -1,0 +1,53 @@
+services:
+  # Auth Service (Essential)
+  - type: web
+    name: alfa-auth
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./backend/go-services/auth-service
+    plan: free
+    envVars:
+      - key: POSTGRES_DSN
+        fromDatabase:
+          name: alfa-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+
+  # Market Data Service
+  - type: web
+    name: alfa-market-data
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./backend/go-services/market-data
+    plan: free
+    envVars:
+      - key: REDIS_ADDR
+        fromService:
+          type: redis
+          name: alfa-redis
+          property: connectionString
+
+  # Socket Server
+  - type: web
+    name: alfa-socket-server
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./backend/go-services/socket-server
+    plan: free
+    envVars:
+      - key: REDIS_ADDR
+        fromService:
+          type: redis
+          name: alfa-redis
+          property: connectionString
+
+  # Redis
+  - type: redis
+    name: alfa-redis
+    plan: free
+    ipAllowList: []
+
+databases:
+  - name: alfa-db
+    plan: free
