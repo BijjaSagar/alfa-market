@@ -1,0 +1,112 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: alfa_postgres
+    environment:
+      POSTGRES_USER: alfa_user
+      POSTGRES_PASSWORD: alfa_password
+      POSTGRES_DB: alfa_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - alfa_net
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: alfa_timescaledb
+    environment:
+      POSTGRES_USER: alfa_user
+      POSTGRES_PASSWORD: alfa_password
+      POSTGRES_DB: alfa_market_data
+    ports:
+      - "5435:5432"
+    volumes:
+      - timescaledb_data:/var/lib/postgresql/data
+    networks:
+      - alfa_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: alfa_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - alfa_net
+
+  market-data:
+    build: ../../backend/go-services/market-data
+    container_name: alfa_market_data
+    depends_on:
+      - redis
+      - timescaledb
+    environment:
+      REDIS_ADDR: redis:6379
+    ports:
+      - "8081:8081"
+    networks:
+      - alfa_net
+
+  socket-server:
+    build: ../../backend/go-services/socket-server
+    container_name: alfa_socket_server
+    depends_on:
+      - redis
+    environment:
+      REDIS_ADDR: redis:6379
+    ports:
+      - "8080:8080"
+    networks:
+      - alfa_net
+
+  oms:
+    build: ../../backend/go-services/oms
+    container_name: alfa_oms
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      POSTGRES_DSN: postgres://alfa_user:alfa_password@postgres:5432/alfa_db?sslmode=disable
+      REDIS_ADDR: redis:6379
+    ports:
+      - "8082:8082"
+    networks:
+      - alfa_net
+
+  auth-service:
+    build: ../../backend/go-services/auth-service
+    container_name: alfa_auth_service
+    depends_on:
+      - postgres
+    environment:
+      POSTGRES_DSN: postgres://alfa_user:alfa_password@postgres:5432/alfa_db?sslmode=disable
+    ports:
+      - "8083:8083"
+    networks:
+      - alfa_net
+
+  strategy-engine:
+    build: ../../backend/strategy-engine
+    container_name: alfa_strategy_engine
+    depends_on:
+      - redis
+      - oms
+    environment:
+      REDIS_HOST: redis
+      OMS_URL: http://oms:8082/orders
+    ports:
+      - "8000:8000"
+    networks:
+      - alfa_net
+
+volumes:
+  postgres_data:
+  timescaledb_data:
+
+
+networks:
+  alfa_net:
+    driver: bridge

@@ -1,0 +1,56 @@
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+.pub-cache/
+.pub/
+
+# Android
+android/.gradle
+android/local.properties
+android/app/build
+android/.idea
+android/.gradle
+
+# iOS
+ios/.symlinks
+ios/Pods
+ios/Podfile.lock
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+.venv
+
+# Go
+bin/
+dist/
+*.exe
+*.test
+*.out
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Terraform/Infrastructure
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Local Dev
+infra/docker/postgres_data/
+infra/docker/timescaledb_data/

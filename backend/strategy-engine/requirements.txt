@@ -1,0 +1,6 @@
+redis
+pandas
+requests
+numpy
+fastapi
+uvicorn

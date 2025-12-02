@@ -1,0 +1,82 @@
+services:
+  # 1. Market Data Service
+  - type: web
+    name: alfa-market-data
+    env: docker
+    plan: free
+    dockerContext: backend/go-services/market-data
+    envVars:
+      - key: REDIS_ADDR
+        fromService: alfa-redis
+        type: redis
+        property: hostAndPort
+
+  # 2. Socket Server
+  - type: web
+    name: alfa-socket-server
+    env: docker
+    plan: free
+    dockerContext: backend/go-services/socket-server
+    envVars:
+      - key: REDIS_ADDR
+        fromService: alfa-redis
+        type: redis
+        property: hostAndPort
+
+  # 3. Order Management System (OMS)
+  - type: web
+    name: alfa-oms
+    env: docker
+    plan: free
+    dockerContext: backend/go-services/oms
+    envVars:
+      - key: REDIS_ADDR
+        fromService: alfa-redis
+        type: redis
+        property: hostAndPort
+      - key: POSTGRES_DSN
+        fromDatabase: alfa-db
+        property: connectionString
+
+  # 4. Auth Service
+  - type: web
+    name: alfa-auth
+    env: docker
+    plan: free
+    dockerContext: backend/go-services/auth-service
+    envVars:
+      - key: POSTGRES_DSN
+        fromDatabase: alfa-db
+        property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+
+  # 5. Strategy Engine
+  - type: web
+    name: alfa-strategy-engine
+    env: docker
+    plan: free
+    dockerContext: backend/strategy-engine
+    envVars:
+      - key: REDIS_HOST
+        fromService: alfa-redis
+        type: redis
+        property: host
+      - key: REDIS_PORT
+        fromService: alfa-redis
+        type: redis
+        property: port
+      - key: OMS_URL
+        value: http://alfa-oms:8082/orders
+
+databases:
+  - name: alfa-db
+    plan: free
+    databaseName: alfa_db
+    user: alfa_user
+
+services:
+  - type: redis
+    name: alfa-redis
+    plan: free
+    ipAllowList: [] # Internal only

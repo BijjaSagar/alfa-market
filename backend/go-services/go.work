@@ -1,0 +1,9 @@
+go 1.25.4
+
+use (
+	./market-data
+	./oms
+	./proto
+	./socket-server
+	./auth-service
+)

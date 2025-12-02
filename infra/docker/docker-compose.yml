@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: alfa_postgres
+    environment:
+      POSTGRES_USER: alfa_user
+      POSTGRES_PASSWORD: alfa_password
+      POSTGRES_DB: alfa_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - alfa_net
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: alfa_timescaledb
+    environment:
+      POSTGRES_USER: alfa_user
+      POSTGRES_PASSWORD: alfa_password
+      POSTGRES_DB: alfa_market_data
+    ports:
+      - "5435:5432"
+    volumes:
+      - timescaledb_data:/var/lib/postgresql/data
+    networks:
+      - alfa_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: alfa_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - alfa_net
+
+volumes:
+  postgres_data:
+  timescaledb_data:
+
+
+networks:
+  alfa_net:
+    driver: bridge
