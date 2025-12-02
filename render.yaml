@@ -3,7 +3,6 @@ services:
   - type: web
     name: alfa-market-data
     env: docker
-    dockerfilePath: ./Dockerfile
     dockerContext: ./backend/go-services/market-data
     plan: free
     envVars:
@@ -17,7 +16,6 @@ services:
   - type: web
     name: alfa-socket-server
     env: docker
-    dockerfilePath: ./Dockerfile
     dockerContext: ./backend/go-services/socket-server
     plan: free
     envVars:
@@ -31,7 +29,6 @@ services:
   - type: web
     name: alfa-oms
     env: docker
-    dockerfilePath: ./Dockerfile
     dockerContext: ./backend/go-services/oms
     plan: free
     envVars:
@@ -49,7 +46,6 @@ services:
   - type: web
     name: alfa-auth
     env: docker
-    dockerfilePath: ./Dockerfile
     dockerContext: ./backend/go-services/auth-service
     plan: free
     envVars:
@@ -64,7 +60,6 @@ services:
   - type: web
     name: alfa-strategy-engine
     env: docker
-    dockerfilePath: ./Dockerfile
     dockerContext: ./backend/strategy-engine
     plan: free
     envVars:
@@ -85,5 +80,6 @@ services:
 databases:
   - name: alfa-db
     plan: free
+
 
 
