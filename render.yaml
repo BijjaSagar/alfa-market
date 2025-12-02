@@ -1,83 +1,89 @@
 services:
-  # 1. Market Data Service
+  # Market Data Service
   - type: web
     name: alfa-market-data
     env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./backend/go-services/market-data
     plan: free
-    dockerContext: backend/go-services/market-data
     envVars:
       - key: REDIS_ADDR
-        fromService: alfa-redis
-        type: redis
-        property: hostAndPort
+        fromService:
+          type: redis
+          name: alfa-redis
+          property: connectionString
 
-  # 2. Socket Server
+  # Socket Server
   - type: web
     name: alfa-socket-server
     env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./backend/go-services/socket-server
     plan: free
-    dockerContext: backend/go-services/socket-server
     envVars:
       - key: REDIS_ADDR
-        fromService: alfa-redis
-        type: redis
-        property: hostAndPort
+        fromService:
+          type: redis
+          name: alfa-redis
+          property: connectionString
 
-  # 3. Order Management System (OMS)
+  # Order Management System
   - type: web
     name: alfa-oms
     env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./backend/go-services/oms
     plan: free
-    dockerContext: backend/go-services/oms
     envVars:
       - key: REDIS_ADDR
-        fromService: alfa-redis
-        type: redis
-        property: hostAndPort
+        fromService:
+          type: redis
+          name: alfa-redis
+          property: connectionString
       - key: POSTGRES_DSN
-        fromDatabase: alfa-db
-        property: connectionString
+        fromDatabase:
+          name: alfa-db
+          property: connectionString
 
-  # 4. Auth Service
+  # Auth Service
   - type: web
     name: alfa-auth
     env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./backend/go-services/auth-service
     plan: free
-    dockerContext: backend/go-services/auth-service
     envVars:
       - key: POSTGRES_DSN
-        fromDatabase: alfa-db
-        property: connectionString
+        fromDatabase:
+          name: alfa-db
+          property: connectionString
       - key: JWT_SECRET
         generateValue: true
 
-  # 5. Strategy Engine
+  # Strategy Engine
   - type: web
     name: alfa-strategy-engine
     env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./backend/strategy-engine
     plan: free
-    dockerContext: backend/strategy-engine
     envVars:
       - key: REDIS_HOST
-        fromService: alfa-redis
-        type: redis
-        property: host
-      - key: REDIS_PORT
-        fromService: alfa-redis
-        type: redis
-        property: port
+        fromService:
+          type: redis
+          name: alfa-redis
+          property: host
       - key: OMS_URL
-        value: http://alfa-oms:8082/orders
+        value: https://alfa-oms.onrender.com/orders
 
-  # 6. Redis Cache
+  # Redis
   - type: redis
     name: alfa-redis
     plan: free
-    ipAllowList: [] # Internal only
+    ipAllowList: []
 
 databases:
   - name: alfa-db
     plan: free
-    databaseName: alfa_db
-    user: alfa_user
+
 
