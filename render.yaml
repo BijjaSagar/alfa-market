@@ -69,14 +69,15 @@ services:
       - key: OMS_URL
         value: http://alfa-oms:8082/orders
 
+  # 6. Redis Cache
+  - type: redis
+    name: alfa-redis
+    plan: free
+    ipAllowList: [] # Internal only
+
 databases:
   - name: alfa-db
     plan: free
     databaseName: alfa_db
     user: alfa_user
 
-services:
-  - type: redis
-    name: alfa-redis
-    plan: free
-    ipAllowList: [] # Internal only
